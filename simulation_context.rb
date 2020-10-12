@@ -23,9 +23,9 @@ class SimulationContext
     self.groups_redirected_one_time = 0
     self.groups_redirected_two_times = 0
     self.time_next_match = 0
-    self.asia_match_manager = MatchManager.new('Asia', 30000)
-    self.north_america_match_manager = MatchManager.new('North America', 10000)
-    self.europe_match_manager = MatchManager.new('Europe', 1000)
+    self.asia_match_manager = MatchManager.new('Asia', 300)
+    self.north_america_match_manager = MatchManager.new('North America', 400)
+    self.europe_match_manager = MatchManager.new('Europe', 100)
     self.file_context_name = "execution_context_#{Time.now.strftime("%d_%m_%Y")}.txt"
   end
 
@@ -47,7 +47,7 @@ class SimulationContext
         match_manger_with_ending_match = match_managers.detect { |match_manager| match_manager.time_next_ending_match == lowest_time_next_ending_match}
         match_manger_with_ending_match.end_match(self)
       end
-      actual_context = " | Time: #{self.time} | #{match_managers.reduce("") { |status, match_manager| match_manager.status + " | " + status  }}\n"
+      actual_context = " | Time: #{self.time} | Groups Could Play: #{self.groups_could_play} | Groups Couldn't Play: #{self.groups_could_not_play} | #{match_managers.reduce("") { |status, match_manager| match_manager.status + " | " + status  }}\n"
       puts actual_context
       File.write(self.file_context_name, actual_context, mode: "a")
     end
