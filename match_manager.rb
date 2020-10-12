@@ -73,4 +73,8 @@ class MatchManager
   def status
     "Region: #{self.region_name}: - Number of Matchs: #{self.number_of_matchs} - Time Next Ending Match: #{self.time_next_ending_match}"
   end
+
+  def total_laziness
+    self.matchs_stands.reduce(0) { |laziness, match_stand| laziness + match_stand.laziness_time } / self.matchs_stands.length
+  end
 end

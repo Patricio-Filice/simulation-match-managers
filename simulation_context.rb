@@ -5,21 +5,20 @@ class SimulationContext
                 :end_time,
                 :groups_could_play,
                 :groups_could_not_play,
-                :groups_wanted_to_play,
                 :groups_redirected_one_time,
                 :groups_redirected_two_times,
                 :time_next_match,
                 :asia_match_manager,
                 :north_america_match_manager,
                 :europe_match_manager,
-                :file_context_name
+                :file_context_name,
+                :file_results_name
 
   def initialize
     self.time = 0
     self.end_time = 50000
     self.groups_could_play = 0
     self.groups_could_not_play = 0
-    self.groups_wanted_to_play = 0
     self.groups_redirected_one_time = 0
     self.groups_redirected_two_times = 0
     self.time_next_match = 0
@@ -27,6 +26,7 @@ class SimulationContext
     self.north_america_match_manager = MatchManager.new('North America', 400)
     self.europe_match_manager = MatchManager.new('Europe', 100)
     self.file_context_name = "execution_context_#{Time.now.strftime("%d_%m_%Y")}.txt"
+    self.file_results_name = "execution_results_#{Time.now.strftime("%d_%m_%Y")}.txt"
   end
 
   def run
@@ -51,6 +51,22 @@ class SimulationContext
       puts actual_context
       File.write(self.file_context_name, actual_context, mode: "a")
     end
+
+    total_laziness_asia = self.asia_match_manager.total_laziness
+    total_laziness_north_america = self.north_america_match_manager.total_laziness
+    total_laziness_europe = self.europe_match_manager.total_laziness
+    total_groups = self.groups_could_play + self.groups_could_not_play
+    results = "
+                Percentage Laziness Asia: #{total_laziness_asia * 100 / self.time}
+                Percentage Laziness North America: #{total_laziness_north_america * 100 / self.time}
+                Percentage Laziness Europe: #{total_laziness_europe * 100 / self.time}
+                Groups Could Play: #{self.groups_could_play}
+                Groups Couldn't Play: #{self.groups_could_not_play}
+                Percentage Groups Could Play: #{self.groups_could_play * 100 / total_groups}
+                Percentage Groups Couldn't Play: #{self.groups_could_play * 100 / total_groups}
+                Percentage Groups Were Redirected One Time: #{self.groups_redirected_one_time * 100 / total_groups}
+                Percentage Groups Were Redirected Two Times: #{self.groups_redirected_two_times * 100 / total_groups}"
+    File.write(self.file_results_name, results)
   end
 
   def arrival_interval
@@ -67,7 +83,6 @@ class SimulationContext
     self.time = self.time_next_match
     next_arrival = self.arrival_interval
     self.time_next_match += next_arrival
-    self.groups_wanted_to_play += 1
 
     region_probability = rand
 
