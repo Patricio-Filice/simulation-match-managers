@@ -57,15 +57,15 @@ class SimulationContext
     total_laziness_europe = self.europe_match_manager.total_laziness
     total_groups = self.groups_could_play + self.groups_could_not_play
     results = "
-                Percentage Laziness Asia: #{total_laziness_asia * 100 / self.time}
-                Percentage Laziness North America: #{total_laziness_north_america * 100 / self.time}
-                Percentage Laziness Europe: #{total_laziness_europe * 100 / self.time}
+                Percentage Laziness Asia: #{total_laziness_asia * 100 / self.time}%
+                Percentage Laziness North America: #{total_laziness_north_america * 100 / self.time}%
+                Percentage Laziness Europe: #{total_laziness_europe * 100 / self.time}%
                 Groups Could Play: #{self.groups_could_play}
                 Groups Couldn't Play: #{self.groups_could_not_play}
-                Percentage Groups Could Play: #{self.groups_could_play * 100 / total_groups}
-                Percentage Groups Couldn't Play: #{self.groups_could_play * 100 / total_groups}
-                Percentage Groups Were Redirected One Time: #{self.groups_redirected_one_time * 100 / total_groups}
-                Percentage Groups Were Redirected Two Times: #{self.groups_redirected_two_times * 100 / total_groups}"
+                Percentage Groups Could Play: #{self.groups_could_play * 100 / total_groups}%
+                Percentage Groups Couldn't Play: #{self.groups_could_not_play * 100 / total_groups}%
+                Percentage Groups Were Redirected One Time: #{self.groups_redirected_one_time * 100 / total_groups}%
+                Percentage Groups Were Redirected Two Times: #{self.groups_redirected_two_times * 100 / total_groups}%"
     File.write(self.file_results_name, results)
   end
 
