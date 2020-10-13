@@ -11,10 +11,12 @@ class MatchManager
                 :time_next_ending_match,
                 :next_ending_match
 
-  def initialize(region_name, max_simultaneous_matchs)
+  def initialize(region_name, max_simultaneous_matchs, first_delegated_matcher_manager, second_delegated_match_manager)
     self.region_name = region_name
     self.number_of_matchs = 0
     self.max_simultaneous_matchs = max_simultaneous_matchs
+    self.first_delegated_matcher_manager = first_delegated_matcher_manager
+    self.second_delegated_match_manager = second_delegated_match_manager
     self.time_next_ending_match = ContextConstants::HIGH_VALUE
     self.matchs_stands = Array.new(max_simultaneous_matchs) { MatchStand.new }
   end
@@ -35,11 +37,6 @@ class MatchManager
     else
       reject_group.call(simulation_context)
     end
-  end
-
-  def assign_alternative_matchers(first_delegated_matcher_manager, second_delegated_match_manager)
-    self.first_delegated_matcher_manager = first_delegated_matcher_manager
-    self.second_delegated_match_manager = second_delegated_match_manager
   end
 
   def can_create_match
@@ -72,6 +69,10 @@ class MatchManager
 
   def status
     "Region: #{self.region_name}: - Number of Matchs: #{self.number_of_matchs} - Time Next Ending Match: #{self.time_next_ending_match}"
+  end
+
+  def adjust_match_laziness(simulation_context)
+    self.matchs_stands.each { |match_stand| match_stand.adjust_laziness(simulation_context) }
   end
 
   def total_laziness
