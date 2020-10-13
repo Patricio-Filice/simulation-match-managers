@@ -17,12 +17,12 @@ class SimulationContext
   def initialize
   end
 
-  def run(asia_max_simultaneous_matchs, north_america_max_simultaneous_matchs, europe_max_simultaneous_matchs)
+  def run(end_time, asia_max_simultaneous_matchs, north_america_max_simultaneous_matchs, europe_max_simultaneous_matchs)
     self.asia_match_manager = MatchManager.new('Asia', asia_max_simultaneous_matchs, self.europe_match_manager, self.north_america_match_manager)
     self.north_america_match_manager = MatchManager.new('North America', north_america_max_simultaneous_matchs, self.europe_match_manager, self.asia_match_manager)
     self.europe_match_manager = MatchManager.new('Europe', europe_max_simultaneous_matchs, self.asia_match_manager, self.north_america_match_manager)
     self.time = 0
-    self.end_time = 500
+    self.end_time = end_time
     self.groups_could_play = 0
     self.groups_could_not_play = 0
     self.groups_redirected_one_time = 0
@@ -97,24 +97,31 @@ class SimulationContext
     end
   end
 
-  def run_with_sensibility_tweak(percentage)
-    percentage = percentage / 100.0
-    asia_max_simultaneous_matchs = 185
-    north_america_max_simultaneous_matchs = 285
-    europe_max_simultaneous_matchs = 185
+  def run_with_sensibility_tweak()
+    file_control_variables = File.open("control_variables.txt")
+    control_variables = file_control_variables.readlines.map(&:chomp).map { |value| value.scan(/[1-9][0-9]*/)
+                                                                                         .first
+                                                                                         .to_i}
+    file_control_variables.close
 
-    self.run((asia_max_simultaneous_matchs / percentage).round, (north_america_max_simultaneous_matchs / percentage).round, (europe_max_simultaneous_matchs / percentage).round)
+    asia_max_simultaneous_matchs = control_variables[0]
+    north_america_max_simultaneous_matchs = control_variables[1]
+    europe_max_simultaneous_matchs = control_variables[2]
+    end_time = control_variables[3]
+    percentage = control_variables[4] / 100.0
+
+    self.run(end_time, (asia_max_simultaneous_matchs / percentage).round, (north_america_max_simultaneous_matchs / percentage).round, (europe_max_simultaneous_matchs / percentage).round)
     File.rename("#{self.file_context_name}.txt", "#{self.file_context_name}_upper_tweaked.txt")
     File.rename("#{self.file_results_name}.txt", "#{self.file_results_name}_upper_tweaked.txt")
 
-    self.run((asia_max_simultaneous_matchs * percentage).round, (north_america_max_simultaneous_matchs * percentage).round, (europe_max_simultaneous_matchs * percentage).round)
+    self.run(end_time, (asia_max_simultaneous_matchs * percentage).round, (north_america_max_simultaneous_matchs * percentage).round, (europe_max_simultaneous_matchs * percentage).round)
     File.rename("#{self.file_context_name}.txt", "#{self.file_context_name}_under_tweaked.txt")
     File.rename("#{self.file_results_name}.txt", "#{self.file_results_name}_under_tweaked.txt")
 
-    self.run(asia_max_simultaneous_matchs, north_america_max_simultaneous_matchs, europe_max_simultaneous_matchs)
+    self.run(end_time, asia_max_simultaneous_matchs, north_america_max_simultaneous_matchs, europe_max_simultaneous_matchs)
   end
 end
 
 
 simulation_context = SimulationContext.new
-simulation_context.run_with_sensibility_tweak(35)
+simulation_context.run_with_sensibility_tweak
