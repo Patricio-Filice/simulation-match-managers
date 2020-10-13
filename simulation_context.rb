@@ -22,9 +22,9 @@ class SimulationContext
     self.groups_redirected_one_time = 0
     self.groups_redirected_two_times = 0
     self.time_next_match = 0
-    self.asia_match_manager = MatchManager.new('Asia', 300)
-    self.north_america_match_manager = MatchManager.new('North America', 400)
-    self.europe_match_manager = MatchManager.new('Europe', 100)
+    self.asia_match_manager = MatchManager.new('Asia', 185)
+    self.north_america_match_manager = MatchManager.new('North America', 285)
+    self.europe_match_manager = MatchManager.new('Europe', 85)
     self.file_context_name = "execution_context_#{Time.now.strftime("%d_%m_%Y")}.txt"
     self.file_results_name = "execution_results_#{Time.now.strftime("%d_%m_%Y")}.txt"
   end
@@ -56,22 +56,23 @@ class SimulationContext
     total_laziness_north_america = self.north_america_match_manager.total_laziness
     total_laziness_europe = self.europe_match_manager.total_laziness
     total_groups = self.groups_could_play + self.groups_could_not_play
-    results = "
-                Percentage Laziness Asia: #{total_laziness_asia * 100 / self.time}%
+    match_stands_laziness = match_managers.reduce("") { |laziness, match_manager| "#{laziness}#{match_manager.match_stands_laziness}\n"  }
+    results = "Simulation Results:
+                Percentage Laziness Asia: #{total_laziness_asia * 100.0 / self.time}%
                 Percentage Laziness North America: #{total_laziness_north_america * 100 / self.time}%
-                Percentage Laziness Europe: #{total_laziness_europe * 100 / self.time}%
+                Percentage Laziness Europe: #{total_laziness_europe * 100.0 / self.time}%
                 Groups Could Play: #{self.groups_could_play}
                 Groups Couldn't Play: #{self.groups_could_not_play}
-                Percentage Groups Could Play: #{self.groups_could_play * 100 / total_groups}%
-                Percentage Groups Couldn't Play: #{self.groups_could_not_play * 100 / total_groups}%
-                Percentage Groups Were Redirected One Time: #{self.groups_redirected_one_time * 100 / total_groups}%
-                Percentage Groups Were Redirected Two Times: #{self.groups_redirected_two_times * 100 / total_groups}%"
+                Percentage Groups Could Play: #{self.groups_could_play * 100.0 / total_groups}%
+                Percentage Groups Couldn't Play: #{self.groups_could_not_play * 100.0 / total_groups}%
+                Percentage Groups Were Redirected One Time: #{self.groups_redirected_one_time * 100.0 / total_groups}%
+                Percentage Groups Were Redirected Two Times: #{self.groups_redirected_two_times * 100.0 / total_groups}%\n" + match_stands_laziness
     File.write(self.file_results_name, results)
   end
 
   def arrival_interval
-    numerator = (4.19859 * ((0.00591+rand) ** 0.5301))
-    divider = ((1 + (3.88977 * ((0.00591+rand) ** 1.5301))) ** 1.70544)
+    numerator = 4.19859 * ((0.00591+rand) ** 0.5301)
+    divider = (1 + (3.88977 * ((0.00591+rand) ** 1.5301))) ** 1.70544
     numerator / divider
   end
 

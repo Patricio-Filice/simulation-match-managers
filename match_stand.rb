@@ -10,6 +10,6 @@ class MatchStand
   end
 
   def calculate_laziness(actual_time)
-    self.laziness_time = actual_time - self.last_time_disoccupied
+    self.laziness_time += actual_time - self.last_time_disoccupied
   end
 end
