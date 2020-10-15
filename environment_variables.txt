@@ -1,0 +1,5 @@
+Match Stands Asia: 185
+Match Stands Europe: 85
+Match Stands North America: 285
+Ending Time: 5000
+Sensibility Tweak: 35

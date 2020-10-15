@@ -12,15 +12,17 @@ class SimulationContext
                 :north_america_match_manager,
                 :europe_match_manager,
                 :file_context_name,
-                :file_results_name
+                :file_results_name,
+                :trace_context
 
-  def initialize
+  def initialize(asia_max_simultaneous_matchs, north_america_max_simultaneous_matchs, europe_max_simultaneous_matchs, trace_context = false)
+    self.asia_match_manager = MatchManager.new('Asia', asia_max_simultaneous_matchs)
+    self.north_america_match_manager = MatchManager.new('North America', north_america_max_simultaneous_matchs)
+    self.europe_match_manager = MatchManager.new('Europe', europe_max_simultaneous_matchs)
+    self.trace_context = trace_context
   end
 
-  def run(end_time, asia_max_simultaneous_matchs, north_america_max_simultaneous_matchs, europe_max_simultaneous_matchs)
-    self.asia_match_manager = MatchManager.new('Asia', asia_max_simultaneous_matchs, self.europe_match_manager, self.north_america_match_manager)
-    self.north_america_match_manager = MatchManager.new('North America', north_america_max_simultaneous_matchs, self.europe_match_manager, self.asia_match_manager)
-    self.europe_match_manager = MatchManager.new('Europe', europe_max_simultaneous_matchs, self.asia_match_manager, self.north_america_match_manager)
+  def run(end_time, context_name, results_name)
     self.time = 0
     self.end_time = end_time
     self.groups_could_play = 0
@@ -28,12 +30,13 @@ class SimulationContext
     self.groups_redirected_one_time = 0
     self.groups_redirected_two_times = 0
     self.time_next_match = 0
-    self.file_context_name = "execution_context_#{Time.now.strftime("%d_%m_%Y")}"
-    self.file_results_name = "execution_results_#{Time.now.strftime("%d_%m_%Y")}"
+    self.asia_match_manager.assign_delegates(self.europe_match_manager, self.north_america_match_manager)
+    self.north_america_match_manager.assign_delegates(self.europe_match_manager, self.asia_match_manager)
+    self.europe_match_manager.assign_delegates(self.asia_match_manager, self.north_america_match_manager)
+    self.file_context_name = "#{context_name}_#{Time.now.strftime("%d_%m_%Y")}"
+    self.file_results_name = "#{results_name}_#{Time.now.strftime("%d_%m_%Y")}"
 
     File.write("#{self.file_context_name}.txt", "")
-
-
 
     match_managers = [self.asia_match_manager, self.north_america_match_manager, self.europe_match_manager]
 
@@ -48,7 +51,7 @@ class SimulationContext
         match_manger_with_ending_match.end_match(self)
       end
       actual_context = " | Time: #{self.time} | Groups Could Play: #{self.groups_could_play} | Groups Couldn't Play: #{self.groups_could_not_play} | #{match_managers.reduce("") { |status, match_manager| match_manager.status + " | " + status  }}\n"
-      puts actual_context
+      puts actual_context if self.trace_context
       File.write("#{self.file_context_name}.txt", actual_context, mode: "a")
     end
 
@@ -57,8 +60,9 @@ class SimulationContext
     total_laziness_north_america = self.north_america_match_manager.total_laziness
     total_laziness_europe = self.europe_match_manager.total_laziness
     total_groups = self.groups_could_play + self.groups_could_not_play
+    control_results = match_managers.reduce("") { |results, match_manager| "#{match_manager.control_result} - #{results}" }
     match_stands_laziness = match_managers.reduce("") { |laziness, match_manager| "#{laziness}#{match_manager.match_stands_laziness}\n"  }
-    results = "Simulation Results - Asia Match Stands ##{asia_max_simultaneous_matchs} - North America Match Stands ##{north_america_max_simultaneous_matchs} - Europe Match Stands ##{europe_max_simultaneous_matchs}:
+    results = "Simulation Results - #{control_results}:
                 Percentage Laziness Asia: #{total_laziness_asia * 100.0 / self.time}%
                 Percentage Laziness North America: #{total_laziness_north_america * 100 / self.time}%
                 Percentage Laziness Europe: #{total_laziness_europe * 100.0 / self.time}%
@@ -96,32 +100,4 @@ class SimulationContext
       self.asia_match_manager.create_match(self)
     end
   end
-
-  def run_with_sensibility_tweak()
-    file_control_variables = File.open("control_variables.txt")
-    control_variables = file_control_variables.readlines.map(&:chomp).map { |value| value.scan(/[1-9][0-9]*/)
-                                                                                         .first
-                                                                                         .to_i}
-    file_control_variables.close
-
-    asia_max_simultaneous_matchs = control_variables[0]
-    north_america_max_simultaneous_matchs = control_variables[1]
-    europe_max_simultaneous_matchs = control_variables[2]
-    end_time = control_variables[3]
-    percentage = control_variables[4] / 100.0
-
-    self.run(end_time, (asia_max_simultaneous_matchs / percentage).round, (north_america_max_simultaneous_matchs / percentage).round, (europe_max_simultaneous_matchs / percentage).round)
-    File.rename("#{self.file_context_name}.txt", "#{self.file_context_name}_upper_tweaked.txt")
-    File.rename("#{self.file_results_name}.txt", "#{self.file_results_name}_upper_tweaked.txt")
-
-    self.run(end_time, (asia_max_simultaneous_matchs * percentage).round, (north_america_max_simultaneous_matchs * percentage).round, (europe_max_simultaneous_matchs * percentage).round)
-    File.rename("#{self.file_context_name}.txt", "#{self.file_context_name}_under_tweaked.txt")
-    File.rename("#{self.file_results_name}.txt", "#{self.file_results_name}_under_tweaked.txt")
-
-    self.run(end_time, asia_max_simultaneous_matchs, north_america_max_simultaneous_matchs, europe_max_simultaneous_matchs)
-  end
 end
-
-
-simulation_context = SimulationContext.new
-simulation_context.run_with_sensibility_tweak
