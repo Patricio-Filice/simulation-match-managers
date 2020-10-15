@@ -61,7 +61,7 @@ class SimulationContext
     total_laziness_europe = self.europe_match_manager.total_laziness
     total_groups = self.groups_could_play + self.groups_could_not_play
     control_results = match_managers.reduce("") { |results, match_manager| "#{match_manager.control_result} - #{results}" }
-    match_stands_laziness = match_managers.reduce("") { |laziness, match_manager| "#{laziness}#{match_manager.match_stands_laziness}\n"  }
+    match_stands_laziness = match_managers.reduce("") { |laziness, match_manager| "#{laziness}#{match_manager.match_stands_percentage_laziness(self.time)}%\n"  }
     results = "Simulation Results - #{control_results}:
                 Percentage Laziness Asia: #{total_laziness_asia * 100.0 / self.time}%
                 Percentage Laziness North America: #{total_laziness_north_america * 100 / self.time}%

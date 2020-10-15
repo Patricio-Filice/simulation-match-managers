@@ -88,7 +88,7 @@ class MatchManager
     self.matchs_stands.reduce(0) { |laziness, match_stand| laziness + match_stand.laziness_time } / self.matchs_stands.length
   end
 
-  def match_stands_laziness
-    self.matchs_stands.each_with_index.reduce(""){ |laziness, (match_stand, index)| "#{laziness}#{ContextConstants::RESULT_TABULATION}#{self.region_name} - Match Stand ##{index}: #{match_stand.laziness_time}\n" }
+  def match_stands_percentage_laziness(time)
+    self.matchs_stands.each_with_index.reduce(""){ |laziness, (match_stand, index)| "#{laziness}#{ContextConstants::RESULT_TABULATION}#{self.region_name} - Match Stand ##{index}: #{match_stand.laziness_time * 100 / time}\n" }
   end
 end
