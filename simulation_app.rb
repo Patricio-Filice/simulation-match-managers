@@ -20,7 +20,6 @@ class SimulationApp
 
     puts 'Starting Simulations'
 
-    asd = (asia_max_simultaneous_matchs / (complement_percentage / 2)).round
     threads << create_simulation_thread('Upper Tweak', (asia_max_simultaneous_matchs / half_percentage).round, (north_america_max_simultaneous_matchs / half_percentage).round, (europe_max_simultaneous_matchs / half_percentage).round, end_time, file_context_name + '_upper_tweaked', file_results_name + '_upper_tweaked')
     threads << create_simulation_thread('Half Upper Tweak', (asia_max_simultaneous_matchs / half_percentage).round, (north_america_max_simultaneous_matchs / half_percentage).round, (europe_max_simultaneous_matchs / half_percentage.round).round, end_time, file_context_name + '_half_upper_tweaked', file_results_name + '_half_upper_tweaked')
     threads << create_simulation_thread('No Tweak', asia_max_simultaneous_matchs, north_america_max_simultaneous_matchs, europe_max_simultaneous_matchs, end_time, file_context_name, file_results_name)
