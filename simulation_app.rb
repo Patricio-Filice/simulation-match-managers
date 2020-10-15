@@ -12,15 +12,16 @@ class SimulationApp
     europe_max_simultaneous_matchs = environment_variables[1]
     north_america_max_simultaneous_matchs = environment_variables[2]
     end_time = environment_variables[3]
-    percentage = environment_variables[4] / 100.0
-    half_percentage = (1 - percentage * 2)
+    file_percentage = environment_variables[4] / 100.0
+    percentage = (1 - file_percentage)
+    half_percentage = (1 - file_percentage / 2)
     file_context_name = 'execution_context'
     file_results_name = 'execution_results'
     threads = []
 
     puts 'Starting Simulations'
 
-    threads << create_simulation_thread('Upper Tweak', (asia_max_simultaneous_matchs / half_percentage).round, (north_america_max_simultaneous_matchs / half_percentage).round, (europe_max_simultaneous_matchs / half_percentage).round, end_time, file_context_name + '_upper_tweaked', file_results_name + '_upper_tweaked')
+    threads << create_simulation_thread('Upper Tweak', (asia_max_simultaneous_matchs / percentage).round, (north_america_max_simultaneous_matchs / percentage).round, (europe_max_simultaneous_matchs / percentage).round, end_time, file_context_name + '_upper_tweaked', file_results_name + '_upper_tweaked')
     threads << create_simulation_thread('Half Upper Tweak', (asia_max_simultaneous_matchs / half_percentage).round, (north_america_max_simultaneous_matchs / half_percentage).round, (europe_max_simultaneous_matchs / half_percentage).round, end_time, file_context_name + '_half_upper_tweaked', file_results_name + '_half_upper_tweaked')
     threads << create_simulation_thread('No Tweak', asia_max_simultaneous_matchs, north_america_max_simultaneous_matchs, europe_max_simultaneous_matchs, end_time, file_context_name, file_results_name)
     threads << create_simulation_thread('Half Under Tweak', (asia_max_simultaneous_matchs * half_percentage).round, (north_america_max_simultaneous_matchs * half_percentage).round, (europe_max_simultaneous_matchs * half_percentage).round, end_time, file_context_name + '_half_under_tweaked', file_results_name + '_half_under_tweaked')
